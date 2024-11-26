@@ -2,19 +2,31 @@ import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
+// 创建任务架构
 const TaskSchema = new Schema({
   title: { type: String, required: true },
-  description:  String ,
-  deadline: Date,
-    done: Boolean,
-    priority: { type: String, enum: ["Low", "Medium", "High"], required: true },
-    created_at: Date,
-    updated_at: Date
-});
+  description: { type: String },
+  deadline: { 
+    type: Date,
+    validate: {
+      validator: (date) => date > new Date(),  
+      message: 'Deadline must be in the future.'
+    }
+  },
+  done: { type: Boolean },
+  priority: { 
+    type: String, 
+    enum: ["Low", "Medium", "High"], 
+    required: true 
+  },
+  created_at: { type: Date, default: Date.now },
+  updated_at: { type: Date, default: Date.now },
 
-const dateValidator = (date) => {
-    return date > new Date();
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User', 
+    required: true 
   }
-  TaskSchema.path("deadline").validate(dateValidator);
+});
 
 export default mongoose.model('Task', TaskSchema);
